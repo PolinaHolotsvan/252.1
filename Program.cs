@@ -1,187 +1,73 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-namespace AbstractFactory
+namespace FactoryMethodExample
 {
-    public class AbstractFactory
+    public abstract class Creator
     {
-        // AbstractProductA
-        abstract class Car
-        {
-            public abstract void Info();
-        }
-        // ConcreteProductA1
-        class Ford : Car
-        {
-            public override void Info()
-            {
-                Console.WriteLine("Ford");
-            }
-        }
-        //ConcreteProductA2
-        class Toyota : Car
-        {
-            public override void Info()
-            {
-                Console.WriteLine("Toyota");
-            }
-        }
+        public abstract Product FactoryMethod(int type, int id);
+    }
 
-        class Mersedes : Car
+    public class ConcreteCreator : Creator
+    {
+        public override Product FactoryMethod(int type, int id)
         {
-            public override void Info()
+            switch (type)
             {
-                Console.WriteLine("Mersedes");
+                case 1: return new Phone(id);
+                case 2: return new Laptop(id); 
+                case 3: return new Tablet(id);
+                default: throw new ArgumentException("Invalid type.", "type");
             }
         }
+    }
 
-        abstract class Wheels
+    public abstract class Product {
+        public int id;
+        abstract public void Info();
+    }
+    public class Phone : Product
+    {
+        public Phone(int id)
         {
-            public virtual void GetSpeed()
-            {
-            }
+            this.id = id;
         }
+        public override void Info()
+        {
+            Console.WriteLine($"Phone with id {id}");
+        }
+    }
+    public class Laptop : Product {
+        public Laptop(int id)
+        {
+            this.id = id;
+        }
+        public override void Info()
+        {
+        Console.WriteLine($"Laptop with id {id}");
+        }
+    }
+    public class Tablet : Product
+    {
+        public Tablet(int id)
+        {
+            this.id = id;
+        }
+        public override void Info()
+        {
+            Console.WriteLine($"Tablet with id {id}");
+        }
+    }
 
-        class FordWheels : Wheels
-        {
-            public override void GetSpeed()
+        class MainApp
+    {
+        static void Main()
+        {  
+            Random rnd = new Random();
+            Creator creator = new ConcreteCreator();
+            for (int i = 1; i <= 3; i++)
             {
-                Console.WriteLine("Ford Wheels");
+                var product = creator.FactoryMethod(i, rnd.Next(1000, 10000));
+                product.Info();
             }
-        }
-
-        class ToyotaWheels : Wheels
-        {
-            public override void GetSpeed()
-            {
-                Console.WriteLine("Toyota Wheels");
-            }
-        }
-
-        class MersedesWheels : Wheels
-        {
-            public override void GetSpeed()
-            {
-                Console.WriteLine("Mersedes Wheels");
-            }
-        }
-        abstract class Engine
-        {
-            public virtual void GetPower()
-            {
-            }
-        }
-        // ConcreteProductB1
-        class FordEngine : Engine
-        {
-            public override void GetPower()
-            {
-                Console.WriteLine("Ford Engine 4.4");
-            }
-        }
-
-        //ConcreteProductB2
-        class ToyotaEngine : Engine
-        {
-            public override void GetPower()
-            {
-                Console.WriteLine("Toyota Engine 3.2");
-            }
-        }
-
-        class MersedesEngine : Engine
-        {
-            public override void GetPower()
-            {
-                Console.WriteLine("Mersedes Engine 1.1");
-            }
-        }
-        // AbstractFactory
-        interface ICarFactory
-        {
-            Car CreateCar();
-            Engine CreateEngine();
-            Wheels CreateWheels();
-        }
-        // ConcreteFactory1
-        class FordFactory : ICarFactory
-        {
-            // from CarFactory
-            Car ICarFactory.CreateCar()
-            {
-                return new Ford();
-            }
-            Engine ICarFactory.CreateEngine()
-            {
-                return new FordEngine();
-            }
-
-            Wheels ICarFactory.CreateWheels()
-            {
-                return new FordWheels();
-            }
-        }
-        // ConcreteFactory2
-        class ToyotaFactory : ICarFactory
-        {
-            // from CarFactory
-            Car ICarFactory.CreateCar()
-            {
-                return new Toyota();
-            }
-            Engine ICarFactory.CreateEngine()
-            {
-                return new ToyotaEngine();
-            }
-            Wheels ICarFactory.CreateWheels()
-            {
-                return new ToyotaWheels();
-            }
-        }
-
-        class MersedesFactory : ICarFactory
-        {
-            // from CarFactory
-            Car ICarFactory.CreateCar()
-            {
-                return new Mersedes();
-            }
-            Engine ICarFactory.CreateEngine()
-            {
-                return new MersedesEngine();
-            }
-            Wheels ICarFactory.CreateWheels()
-            {
-                return new MersedesWheels();
-            }
-        }
-        static void Main(string[] args)
-        {
-            ICarFactory carFactory = new ToyotaFactory();
-            Car myCar = carFactory.CreateCar();
-            myCar.Info();
-            Engine myEngine = carFactory.CreateEngine();
-            myEngine.GetPower();
-            Wheels myWheels = carFactory.CreateWheels();
-            myWheels.GetSpeed();
-
-            carFactory = new FordFactory(); 
-            myCar = carFactory.CreateCar();
-            myCar.Info();
-            myEngine = carFactory.CreateEngine();
-            myEngine.GetPower();
-            myWheels = carFactory.CreateWheels();
-            myWheels.GetSpeed();
-
-            carFactory = new MersedesFactory();
-            myCar = carFactory.CreateCar();
-            myCar.Info();
-            myEngine = carFactory.CreateEngine();
-            myEngine.GetPower();
-            myWheels = carFactory.CreateWheels();
-            myWheels.GetSpeed();
             Console.ReadKey();
         }
     }
