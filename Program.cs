@@ -1,188 +1,129 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-namespace AbstractFactory
+using System.Collections;
+namespace Mediator.Examples
 {
-    public class AbstractFactory
+    // Mainapp test application
+    class MainApp
     {
-        // AbstractProductA
-        abstract class Car
+        static void Main()
         {
-            public abstract void Info();
+            ConcreteMediator m = new ConcreteMediator();
+            ConcreteColleague1 c1 = new ConcreteColleague1(m);
+            ConcreteColleague2 c2 = new ConcreteColleague2(m);
+            ConcreteColleague3 c3 = new ConcreteColleague3(m);
+            m.Colleague1 = c1;
+            m.Colleague2 = c2;
+            m.Colleague3 = c3;
+            m.Send("How are you?", c1);
+            m.Send("Fine, thanks", c2);
+            m.Send("Hello!", c3);
+            // Wait for user
+            Console.Read();
         }
-        // ConcreteProductA1
-        class Ford : Car
+    }
+    // "Mediator"
+    abstract class Mediator
+    {
+        public abstract void Send(string message,
+        Colleague colleague);
+    }
+    // "ConcreteMediator"
+    class ConcreteMediator : Mediator
+    {
+        private ConcreteColleague1 colleague1;
+        private ConcreteColleague2 colleague2;
+        private ConcreteColleague3 colleague3;
+        public ConcreteColleague1 Colleague1
         {
-            public override void Info()
+            set { colleague1 = value; }
+        }
+        public ConcreteColleague2 Colleague2
+        {
+            set { colleague2 = value; }
+        }
+        public ConcreteColleague3 Colleague3
+        {
+            set { colleague3 = value; }
+        }
+        public override void Send(string message,
+        Colleague colleague)
+        {
+            if (colleague == colleague1)
             {
-                Console.WriteLine("Ford");
+                colleague2.Notify(message);
+                colleague3.Notify(message);
             }
-        }
-        //ConcreteProductA2
-        class Toyota : Car
-        {
-            public override void Info()
+            else if (colleague == colleague2)
             {
-                Console.WriteLine("Toyota");
+                colleague1.Notify(message);
+                colleague3.Notify(message);
             }
-        }
-
-        class Mersedes : Car
-        {
-            public override void Info()
+            else
             {
-                Console.WriteLine("Mersedes");
-            }
-        }
-
-        abstract class Wheels
-        {
-            public virtual void GetSpeed()
-            {
-            }
-        }
-
-        class FordWheels : Wheels
-        {
-            public override void GetSpeed()
-            {
-                Console.WriteLine("Ford Wheels");
-            }
-        }
-
-        class ToyotaWheels : Wheels
-        {
-            public override void GetSpeed()
-            {
-                Console.WriteLine("Toyota Wheels");
-            }
-        }
-
-        class MersedesWheels : Wheels
-        {
-            public override void GetSpeed()
-            {
-                Console.WriteLine("Mersedes Wheels");
-            }
-        }
-        abstract class Engine
-        {
-            public virtual void GetPower()
-            {
+                colleague1.Notify(message);
+                colleague2.Notify(message);
             }
         }
-        // ConcreteProductB1
-        class FordEngine : Engine
+    }
+    // "Colleague"
+    abstract class Colleague
+    {
+        protected Mediator mediator;
+        // Constructor
+        public Colleague(Mediator mediator)
         {
-            public override void GetPower()
-            {
-                Console.WriteLine("Ford Engine 4.4");
-            }
+            this.mediator = mediator;
         }
-
-        //ConcreteProductB2
-        class ToyotaEngine : Engine
+    }
+    // "ConcreteColleague1"
+    class ConcreteColleague1 : Colleague
+    {
+        // Constructor
+        public ConcreteColleague1(Mediator mediator)
+        : base(mediator)
         {
-            public override void GetPower()
-            {
-                Console.WriteLine("Toyota Engine 3.2");
-            }
         }
-
-        class MersedesEngine : Engine
+        public void Send(string message)
         {
-            public override void GetPower()
-            {
-                Console.WriteLine("Mersedes Engine 1.1");
-            }
+            mediator.Send(message, this);
         }
-        // AbstractFactory
-        interface ICarFactory
+        public void Notify(string message)
         {
-            Car CreateCar();
-            Engine CreateEngine();
-            Wheels CreateWheels();
+            Console.WriteLine("Colleague1 gets message: " + message);
         }
-        // ConcreteFactory1
-        class FordFactory : ICarFactory
+    }
+    // "ConcreteColleague2"
+    class ConcreteColleague2 : Colleague
+    {
+        // Constructor
+        public ConcreteColleague2(Mediator mediator)
+        : base(mediator)
         {
-            // from CarFactory
-            Car ICarFactory.CreateCar()
-            {
-                return new Ford();
-            }
-            Engine ICarFactory.CreateEngine()
-            {
-                return new FordEngine();
-            }
-
-            Wheels ICarFactory.CreateWheels()
-            {
-                return new FordWheels();
-            }
         }
-        // ConcreteFactory2
-        class ToyotaFactory : ICarFactory
+        public void Send(string message)
         {
-            // from CarFactory
-            Car ICarFactory.CreateCar()
-            {
-                return new Toyota();
-            }
-            Engine ICarFactory.CreateEngine()
-            {
-                return new ToyotaEngine();
-            }
-            Wheels ICarFactory.CreateWheels()
-            {
-                return new ToyotaWheels();
-            }
+            mediator.Send(message, this);
         }
-
-        class MersedesFactory : ICarFactory
+        public void Notify(string message)
         {
-            // from CarFactory
-            Car ICarFactory.CreateCar()
-            {
-                return new Mersedes();
-            }
-            Engine ICarFactory.CreateEngine()
-            {
-                return new MersedesEngine();
-            }
-            Wheels ICarFactory.CreateWheels()
-            {
-                return new MersedesWheels();
-            }
+            Console.WriteLine("Colleague2 gets message: " + message);
         }
-        static void Main(string[] args)
+    }
+    // "ConcreteColleague3"
+    class ConcreteColleague3 : Colleague
+    {
+        // Constructor
+        public ConcreteColleague3(Mediator mediator)
+        : base(mediator)
         {
-            ICarFactory carFactory = new ToyotaFactory();
-            Car myCar = carFactory.CreateCar();
-            myCar.Info();
-            Engine myEngine = carFactory.CreateEngine();
-            myEngine.GetPower();
-            Wheels myWheels = carFactory.CreateWheels();
-            myWheels.GetSpeed();
-
-            carFactory = new FordFactory(); 
-            myCar = carFactory.CreateCar();
-            myCar.Info();
-            myEngine = carFactory.CreateEngine();
-            myEngine.GetPower();
-            myWheels = carFactory.CreateWheels();
-            myWheels.GetSpeed();
-
-            carFactory = new MersedesFactory();
-            myCar = carFactory.CreateCar();
-            myCar.Info();
-            myEngine = carFactory.CreateEngine();
-            myEngine.GetPower();
-            myWheels = carFactory.CreateWheels();
-            myWheels.GetSpeed();
-            Console.ReadKey();
+        }
+        public void Send(string message)
+        {
+            mediator.Send(message, this);
+        }
+        public void Notify(string message)
+        {
+            Console.WriteLine("Colleague3 gets message: " + message);
         }
     }
 }
