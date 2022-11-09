@@ -1,188 +1,89 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-namespace AbstractFactory
+using System.Collections;
+namespace CompositeExample
 {
-    public class AbstractFactory
+    class MainApp
     {
-        // AbstractProductA
-        abstract class Car
+        static void Main()
         {
-            public abstract void Info();
+            FamilyMember grandmother = new Parent("Anna");
+            grandmother.Add(new Child("Vita"));
+
+            FamilyMember mother1 = new Parent("Paul");
+            mother1.Add(new Child("Philip"));
+            mother1.Add(new Child("James"));
+            grandmother.Add(mother1);
+            grandmother.Add(new Child("Kate"));
+
+            Child mother2 = new Child("Carl");
+            grandmother.Add(mother2);
+            grandmother.Remove(mother2);
+            grandmother.Display(0);
+            Console.Read();
         }
-        // ConcreteProductA1
-        class Ford : Car
+    }
+    abstract class FamilyMember
+    {
+        public string name;
+        public FamilyMember(string name)
         {
-            public override void Info()
-            {
-                Console.WriteLine("Ford");
-            }
-        }
-        //ConcreteProductA2
-        class Toyota : Car
-        {
-            public override void Info()
-            {
-                Console.WriteLine("Toyota");
-            }
+            this.name = name;
         }
 
-        class Mersedes : Car
+        public abstract void Add(FamilyMember c);
+        public abstract void Remove(FamilyMember c);
+        public abstract void Display(int depth);
+    }
+    class Parent : FamilyMember
+    {
+        private ArrayList children = new ArrayList();
+        public Parent(string name)
+            : base(name)
         {
-            public override void Info()
-            {
-                Console.WriteLine("Mersedes");
-            }
         }
 
-        abstract class Wheels
+        public override void Add(FamilyMember component)
         {
-            public virtual void GetSpeed()
-            {
-            }
+            children.Add(component);
         }
 
-        class FordWheels : Wheels
+        public override void Remove(FamilyMember component)
         {
-            public override void GetSpeed()
-            {
-                Console.WriteLine("Ford Wheels");
-            }
+            if(children.Contains(component)) children.Remove(component);
+            else Console.WriteLine($"{component.name} isn't {name}'s child");
         }
 
-        class ToyotaWheels : Wheels
+        public override void Display(int depth)
         {
-            public override void GetSpeed()
+            Console.WriteLine(new String('-', depth) + name);
+            foreach (FamilyMember component in children)
             {
-                Console.WriteLine("Toyota Wheels");
+                component.Display(depth + 2);
             }
+        }
+    }
+
+    class Child : FamilyMember
+    {
+        public Child(string name)
+            : base(name)
+        {
         }
 
-        class MersedesWheels : Wheels
+        public override void Add(FamilyMember c)
         {
-            public override void GetSpeed()
-            {
-                Console.WriteLine("Mersedes Wheels");
-            }
-        }
-        abstract class Engine
-        {
-            public virtual void GetPower()
-            {
-            }
-        }
-        // ConcreteProductB1
-        class FordEngine : Engine
-        {
-            public override void GetPower()
-            {
-                Console.WriteLine("Ford Engine 4.4");
-            }
+            Console.WriteLine("A child can't have children");
         }
 
-        //ConcreteProductB2
-        class ToyotaEngine : Engine
+        public override void Remove(FamilyMember c)
         {
-            public override void GetPower()
-            {
-                Console.WriteLine("Toyota Engine 3.2");
-            }
+            Console.WriteLine($"{c.name} isn't {name}'s child");
         }
 
-        class MersedesEngine : Engine
+        public override void Display(int depth)
         {
-            public override void GetPower()
-            {
-                Console.WriteLine("Mersedes Engine 1.1");
-            }
-        }
-        // AbstractFactory
-        interface ICarFactory
-        {
-            Car CreateCar();
-            Engine CreateEngine();
-            Wheels CreateWheels();
-        }
-        // ConcreteFactory1
-        class FordFactory : ICarFactory
-        {
-            // from CarFactory
-            Car ICarFactory.CreateCar()
-            {
-                return new Ford();
-            }
-            Engine ICarFactory.CreateEngine()
-            {
-                return new FordEngine();
-            }
-
-            Wheels ICarFactory.CreateWheels()
-            {
-                return new FordWheels();
-            }
-        }
-        // ConcreteFactory2
-        class ToyotaFactory : ICarFactory
-        {
-            // from CarFactory
-            Car ICarFactory.CreateCar()
-            {
-                return new Toyota();
-            }
-            Engine ICarFactory.CreateEngine()
-            {
-                return new ToyotaEngine();
-            }
-            Wheels ICarFactory.CreateWheels()
-            {
-                return new ToyotaWheels();
-            }
+            Console.WriteLine(new String('-', depth) + name);
         }
 
-        class MersedesFactory : ICarFactory
-        {
-            // from CarFactory
-            Car ICarFactory.CreateCar()
-            {
-                return new Mersedes();
-            }
-            Engine ICarFactory.CreateEngine()
-            {
-                return new MersedesEngine();
-            }
-            Wheels ICarFactory.CreateWheels()
-            {
-                return new MersedesWheels();
-            }
-        }
-        static void Main(string[] args)
-        {
-            ICarFactory carFactory = new ToyotaFactory();
-            Car myCar = carFactory.CreateCar();
-            myCar.Info();
-            Engine myEngine = carFactory.CreateEngine();
-            myEngine.GetPower();
-            Wheels myWheels = carFactory.CreateWheels();
-            myWheels.GetSpeed();
-
-            carFactory = new FordFactory(); 
-            myCar = carFactory.CreateCar();
-            myCar.Info();
-            myEngine = carFactory.CreateEngine();
-            myEngine.GetPower();
-            myWheels = carFactory.CreateWheels();
-            myWheels.GetSpeed();
-
-            carFactory = new MersedesFactory();
-            myCar = carFactory.CreateCar();
-            myCar.Info();
-            myEngine = carFactory.CreateEngine();
-            myEngine.GetPower();
-            myWheels = carFactory.CreateWheels();
-            myWheels.GetSpeed();
-            Console.ReadKey();
-        }
     }
 }
