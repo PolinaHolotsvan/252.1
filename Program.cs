@@ -3,186 +3,87 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-namespace AbstractFactory
+namespace PrototypeFigure
 {
-    public class AbstractFactory
+    class Program
     {
-        // AbstractProductA
-        abstract class Car
-        {
-            public abstract void Info();
-        }
-        // ConcreteProductA1
-        class Ford : Car
-        {
-            public override void Info()
-            {
-                Console.WriteLine("Ford");
-            }
-        }
-        //ConcreteProductA2
-        class Toyota : Car
-        {
-            public override void Info()
-            {
-                Console.WriteLine("Toyota");
-            }
-        }
-
-        class Mersedes : Car
-        {
-            public override void Info()
-            {
-                Console.WriteLine("Mersedes");
-            }
-        }
-
-        abstract class Wheels
-        {
-            public virtual void GetSpeed()
-            {
-            }
-        }
-
-        class FordWheels : Wheels
-        {
-            public override void GetSpeed()
-            {
-                Console.WriteLine("Ford Wheels");
-            }
-        }
-
-        class ToyotaWheels : Wheels
-        {
-            public override void GetSpeed()
-            {
-                Console.WriteLine("Toyota Wheels");
-            }
-        }
-
-        class MersedesWheels : Wheels
-        {
-            public override void GetSpeed()
-            {
-                Console.WriteLine("Mersedes Wheels");
-            }
-        }
-        abstract class Engine
-        {
-            public virtual void GetPower()
-            {
-            }
-        }
-        // ConcreteProductB1
-        class FordEngine : Engine
-        {
-            public override void GetPower()
-            {
-                Console.WriteLine("Ford Engine 4.4");
-            }
-        }
-
-        //ConcreteProductB2
-        class ToyotaEngine : Engine
-        {
-            public override void GetPower()
-            {
-                Console.WriteLine("Toyota Engine 3.2");
-            }
-        }
-
-        class MersedesEngine : Engine
-        {
-            public override void GetPower()
-            {
-                Console.WriteLine("Mersedes Engine 1.1");
-            }
-        }
-        // AbstractFactory
-        interface ICarFactory
-        {
-            Car CreateCar();
-            Engine CreateEngine();
-            Wheels CreateWheels();
-        }
-        // ConcreteFactory1
-        class FordFactory : ICarFactory
-        {
-            // from CarFactory
-            Car ICarFactory.CreateCar()
-            {
-                return new Ford();
-            }
-            Engine ICarFactory.CreateEngine()
-            {
-                return new FordEngine();
-            }
-
-            Wheels ICarFactory.CreateWheels()
-            {
-                return new FordWheels();
-            }
-        }
-        // ConcreteFactory2
-        class ToyotaFactory : ICarFactory
-        {
-            // from CarFactory
-            Car ICarFactory.CreateCar()
-            {
-                return new Toyota();
-            }
-            Engine ICarFactory.CreateEngine()
-            {
-                return new ToyotaEngine();
-            }
-            Wheels ICarFactory.CreateWheels()
-            {
-                return new ToyotaWheels();
-            }
-        }
-
-        class MersedesFactory : ICarFactory
-        {
-            // from CarFactory
-            Car ICarFactory.CreateCar()
-            {
-                return new Mersedes();
-            }
-            Engine ICarFactory.CreateEngine()
-            {
-                return new MersedesEngine();
-            }
-            Wheels ICarFactory.CreateWheels()
-            {
-                return new MersedesWheels();
-            }
-        }
         static void Main(string[] args)
         {
-            ICarFactory carFactory = new ToyotaFactory();
-            Car myCar = carFactory.CreateCar();
-            myCar.Info();
-            Engine myEngine = carFactory.CreateEngine();
-            myEngine.GetPower();
-            Wheels myWheels = carFactory.CreateWheels();
-            myWheels.GetSpeed();
+            Console.OutputEncoding = Encoding.UTF8;
+            IFigure figure = new Rectangle(10, 20);
+            IFigure clonedFigure = figure.Clone();
+            figure.GetInfo();
+            clonedFigure.GetInfo();
+            figure = new Circle(15);
+            clonedFigure = figure.Clone();
+            figure.GetInfo();
+            clonedFigure.GetInfo();
 
-            carFactory = new FordFactory(); 
-            myCar = carFactory.CreateCar();
-            myCar.Info();
-            myEngine = carFactory.CreateEngine();
-            myEngine.GetPower();
-            myWheels = carFactory.CreateWheels();
-            myWheels.GetSpeed();
+            figure = new Triangle(3, 4, 5);
+            clonedFigure = figure.Clone();
+            figure.GetInfo();
+            clonedFigure.GetInfo();
+            Console.Read();
+        }
+    }
+    interface IFigure
+    {
+        IFigure Clone();
+        void GetInfo();
+    }
+    class Rectangle : IFigure
+    {
+        int width;
+        int height;
+        public Rectangle(int w, int h)
+        {
+            width = w;
+            height = h;
+        }
+        public IFigure Clone()
+        {
+            return new Rectangle(this.width, this.height);
+        }
+        public void GetInfo()
+        {
+            Console.WriteLine("Прямокутник довжиною {0} і шириною {1}", height, width);
+        }
+    }
+    class Circle : IFigure
+    {
+        int radius;
+        public Circle(int r)
+        {
+            radius = r;
+        }
+        public IFigure Clone()
+        {
+            return new Circle(this.radius);
+        }
+        public void GetInfo()
+        {
+            Console.WriteLine("Круг радіусом {0}", radius);
+        }
+    }
+    class Triangle : IFigure
+    {
+        int side1;
+        int side2;
+        int side3;
+        public Triangle(int s1, int s2, int s3)
+        {
+            side1= s1;
+            side2= s2;
+            side3= s3;
 
-            carFactory = new MersedesFactory();
-            myCar = carFactory.CreateCar();
-            myCar.Info();
-            myEngine = carFactory.CreateEngine();
-            myEngine.GetPower();
-            myWheels = carFactory.CreateWheels();
-            myWheels.GetSpeed();
-            Console.ReadKey();
+        }
+        public IFigure Clone()
+        {
+            return new Triangle(this.side1, this.side2, this.side3);
+        }
+        public void GetInfo()
+        {
+            Console.WriteLine("Трикутник зі стронами {0}, {1}, {2} см", side1, side2, side3);
         }
     }
 }
