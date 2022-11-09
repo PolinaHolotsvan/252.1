@@ -1,188 +1,85 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-namespace AbstractFactory
+
+namespace Decorator.Examples
 {
-    public class AbstractFactory
+    class MainApp
     {
-        // AbstractProductA
-        abstract class Car
+        static void Main()
         {
-            public abstract void Info();
-        }
-        // ConcreteProductA1
-        class Ford : Car
-        {
-            public override void Info()
-            {
-                Console.WriteLine("Ford");
-            }
-        }
-        //ConcreteProductA2
-        class Toyota : Car
-        {
-            public override void Info()
-            {
-                Console.WriteLine("Toyota");
-            }
-        }
+            Console.OutputEncoding = Encoding.UTF8;
+            // Create ConcreteComponent and two Decorators
+            ConcreteChristmasTree tree = new ConcreteChristmasTree();
+            ConcreteDecoratorToys toysDec = new ConcreteDecoratorToys();
+            ConcreteDecoratorLights lightsDec = new ConcreteDecoratorLights();
 
-        class Mersedes : Car
-        {
-            public override void Info()
-            {
-                Console.WriteLine("Mersedes");
-            }
-        }
+            // Link decorators
+            toysDec.SetComponent(tree);         
+            lightsDec.SetComponent(toysDec);
 
-        abstract class Wheels
-        {
-            public virtual void GetSpeed()
-            {
-            }
-        }
+            lightsDec.Operation();
+            
 
-        class FordWheels : Wheels
-        {
-            public override void GetSpeed()
-            {
-                Console.WriteLine("Ford Wheels");
-            }
+            // Wait for user
+            Console.Read();
         }
+    }
+    // "Component"
+    abstract class ChristmasTree
+    {
+        public abstract void Operation();
+    }
 
-        class ToyotaWheels : Wheels
+    // "ConcreteComponent"
+    class ConcreteChristmasTree : ChristmasTree
+    {
+        public override void Operation()
         {
-            public override void GetSpeed()
-            {
-                Console.WriteLine("Toyota Wheels");
-            }
+            Console.WriteLine("Ялинка стоїть");
         }
+    }
+    // "Decorator"
+    abstract class Decorator : ChristmasTree
+    {
+        protected ChristmasTree component;
 
-        class MersedesWheels : Wheels
+        public void SetComponent(ChristmasTree component)
         {
-            public override void GetSpeed()
+            this.component = component;
+        }
+        public override void Operation()
+        {
+            if (component != null)
             {
-                Console.WriteLine("Mersedes Wheels");
+                component.Operation();
             }
         }
-        abstract class Engine
-        {
-            public virtual void GetPower()
-            {
-            }
-        }
-        // ConcreteProductB1
-        class FordEngine : Engine
-        {
-            public override void GetPower()
-            {
-                Console.WriteLine("Ford Engine 4.4");
-            }
-        }
+    }
 
-        //ConcreteProductB2
-        class ToyotaEngine : Engine
-        {
-            public override void GetPower()
-            {
-                Console.WriteLine("Toyota Engine 3.2");
-            }
-        }
+    // "ConcreteDecoratorA"
+    class ConcreteDecoratorToys : Decorator
+    {
+        public string addedState;
 
-        class MersedesEngine : Engine
+        public override void Operation()
         {
-            public override void GetPower()
-            {
-                Console.WriteLine("Mersedes Engine 1.1");
-            }
+            base.Operation();
+            addedState = "фігурка зайчика";
+            Console.WriteLine($"На ялинці висить {addedState}");
         }
-        // AbstractFactory
-        interface ICarFactory
-        {
-            Car CreateCar();
-            Engine CreateEngine();
-            Wheels CreateWheels();
-        }
-        // ConcreteFactory1
-        class FordFactory : ICarFactory
-        {
-            // from CarFactory
-            Car ICarFactory.CreateCar()
-            {
-                return new Ford();
-            }
-            Engine ICarFactory.CreateEngine()
-            {
-                return new FordEngine();
-            }
+    }
 
-            Wheels ICarFactory.CreateWheels()
-            {
-                return new FordWheels();
-            }
-        }
-        // ConcreteFactory2
-        class ToyotaFactory : ICarFactory
+    // "ConcreteDecoratorB" 
+    class ConcreteDecoratorLights : Decorator
+    {
+        public override void Operation()
         {
-            // from CarFactory
-            Car ICarFactory.CreateCar()
-            {
-                return new Toyota();
-            }
-            Engine ICarFactory.CreateEngine()
-            {
-                return new ToyotaEngine();
-            }
-            Wheels ICarFactory.CreateWheels()
-            {
-                return new ToyotaWheels();
-            }
+            base.Operation();
+            AddedBehavior();
         }
-
-        class MersedesFactory : ICarFactory
+        void AddedBehavior()
         {
-            // from CarFactory
-            Car ICarFactory.CreateCar()
-            {
-                return new Mersedes();
-            }
-            Engine ICarFactory.CreateEngine()
-            {
-                return new MersedesEngine();
-            }
-            Wheels ICarFactory.CreateWheels()
-            {
-                return new MersedesWheels();
-            }
-        }
-        static void Main(string[] args)
-        {
-            ICarFactory carFactory = new ToyotaFactory();
-            Car myCar = carFactory.CreateCar();
-            myCar.Info();
-            Engine myEngine = carFactory.CreateEngine();
-            myEngine.GetPower();
-            Wheels myWheels = carFactory.CreateWheels();
-            myWheels.GetSpeed();
-
-            carFactory = new FordFactory(); 
-            myCar = carFactory.CreateCar();
-            myCar.Info();
-            myEngine = carFactory.CreateEngine();
-            myEngine.GetPower();
-            myWheels = carFactory.CreateWheels();
-            myWheels.GetSpeed();
-
-            carFactory = new MersedesFactory();
-            myCar = carFactory.CreateCar();
-            myCar.Info();
-            myEngine = carFactory.CreateEngine();
-            myEngine.GetPower();
-            myWheels = carFactory.CreateWheels();
-            myWheels.GetSpeed();
-            Console.ReadKey();
+            Console.WriteLine("Ялинка горить жовтими вогниками");
         }
     }
 }
